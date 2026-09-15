@@ -16,28 +16,32 @@
 
 package com.example.android.databinding.basicsample.data
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.Flow
 
 /**
  * A simple VM for [com.example.android.databinding.basicsample.ui.PlainOldActivity].
  */
 class SimpleViewModel : ViewModel() {
-    private val _name = MutableLiveData("Ada")
-    private val _lastName = MutableLiveData("Lovelace")
-    private val _likes = MutableLiveData(0)
+    private val _name = MutableStateFlow("Ada")
+    private val _lastName = MutableStateFlow("Lovelace")
+    private val _likes = MutableStateFlow(0)
 
-    val name: LiveData<String> = _name
-    val lastName: LiveData<String> = _lastName
-    val likes: LiveData<Int> = _likes
+    val name: StateFlow<String> = _name.asStateFlow()
+    val lastName: StateFlow<String> = _lastName.asStateFlow()
+    
+    // Expose structural UI states as continuous Flows mapping business data
+    val likesCountString: Flow<String> = _likes.map { it.toString() }
+    
+    val isProgressBarVisible: Flow<Boolean> = _likes.map { it > 0 }
+    
+    val progressPercent: Flow<Int> = _likes.map { (it * 100 / 5).coerceAtMost(100) }
 
-     //Increments the number of likes.
-
-
-    // popularity is exposed as LiveData using a Transformation instead of a @Bindable property.
-    val popularity: LiveData<Popularity> = Transformations.map(_likes) {
+    val popularity: Flow<Popularity> = _likes.map {
         when {
             it > 9 -> Popularity.STAR
             it > 4 -> Popularity.POPULAR
@@ -48,7 +52,6 @@ class SimpleViewModel : ViewModel() {
     fun onLike() {
         _likes.value = (_likes.value ?: 0) + 1
     }
-
 }
 
 enum class Popularity {
