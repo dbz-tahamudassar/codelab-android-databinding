@@ -17,11 +17,14 @@
 package com.example.android.databinding.basicsample.data
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 
 /**
  * A simple VM for [com.example.android.databinding.basicsample.ui.PlainOldActivity].
@@ -35,7 +38,9 @@ class SimpleViewModel : ViewModel() {
     val lastName: StateFlow<String> = _lastName.asStateFlow()
     
     // Expose structural UI states as continuous Flows mapping business data
-    val likesCountString: Flow<String> = _likes.map { it.toString() }
+    val likesCountString: StateFlow<String> = _likes
+        .map { it.toString() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "0")
     
     val isProgressBarVisible: Flow<Boolean> = _likes.map { it > 0 }
     

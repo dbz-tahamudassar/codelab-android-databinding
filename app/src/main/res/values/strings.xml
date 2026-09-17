@@ -24,4 +24,5 @@
     <string name="name_label">Name</string>
     <string name="profile_avatar_cd">Profile\'s avatar</string>
     <string name="like">Like</string>
+    <string name="detail_view">Detail View</string>"
 </resources>
